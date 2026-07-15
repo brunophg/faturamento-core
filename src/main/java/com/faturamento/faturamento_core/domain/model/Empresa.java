@@ -34,8 +34,7 @@
         public Empresa() {
 
         }
-        public Empresa(Long id, String razaoSocial, String cnpj, String inscricaoEstadual) {
-            this.id = id;
+        public Empresa(String razaoSocial, String cnpj, String inscricaoEstadual) {
             this.razaoSocial = razaoSocial;
             this.cnpj = cnpj;
             this.inscricaoEstadual = inscricaoEstadual;

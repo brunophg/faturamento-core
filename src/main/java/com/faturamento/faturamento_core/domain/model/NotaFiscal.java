@@ -7,6 +7,8 @@ import jakarta.validation.constraints.NotNull;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 @Table(name = "tb_nota_fiscal")
@@ -37,6 +39,10 @@ public class NotaFiscal {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "empresa_id", nullable = false)
     private Empresa empresaEmissora;
+
+    // orphanRemoval = true: se um item for removido da lista, será excluído do banco.
+    @OneToMany(mappedBy = "notaFiscal", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ItemNota> itens = new ArrayList<>();
 
     public NotaFiscal() {
     }
@@ -97,6 +103,21 @@ public class NotaFiscal {
         this.empresaEmissora = empresaEmissora;
     }
 
+    public List<ItemNota> getItens() {
+        return itens;
+    }
+
+
+    public void addItem(ItemNota item) {
+        this.itens.add(item);
+        item.setNotaFiscal(this);
+    }
+
+
+    public void removeItem(ItemNota item) {
+        this.itens.remove(item);
+        item.setNotaFiscal(null);
+    }
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
