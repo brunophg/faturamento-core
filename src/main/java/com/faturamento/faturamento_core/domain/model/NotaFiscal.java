@@ -109,12 +109,10 @@ public class NotaFiscal {
         return List.copyOf(itens);
     }
 
-
     public void addItem(ItemNota item) {
         this.itens.add(item);
         item.setNotaFiscal(this);
     }
-
 
     public void removeItem(ItemNota item) {
         this.itens.remove(item);
