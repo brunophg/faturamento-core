@@ -103,8 +103,10 @@ public class NotaFiscal {
         this.empresaEmissora = empresaEmissora;
     }
 
+
+    // Retorna uma cópia imutável
     public List<ItemNota> getItens() {
-        return itens;
+        return List.copyOf(itens);
     }
 
 
