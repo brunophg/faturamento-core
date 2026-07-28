@@ -27,7 +27,7 @@ public class Usuario implements UserDetails {
 
     }
 
-    public Usuario(Long id, String login, String senha) {
+    public Usuario(String login, String senha) {
         this.id = id;
         this.login = login;
         this.senha = senha;
