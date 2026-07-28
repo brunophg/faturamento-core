@@ -1,7 +1,6 @@
 package com.faturamento.faturamento_core.domain.model;
 
 import jakarta.persistence.*;
-import org.jspecify.annotations.Nullable;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -24,11 +23,10 @@ public class Usuario implements UserDetails {
     private String senha;
 
     public Usuario() {
-
     }
 
     public Usuario(String login, String senha) {
-        this.id = id;
+        // Removido o this.id = id; pois o banco gera o ID automaticamente
         this.login = login;
         this.senha = senha;
     }
@@ -45,40 +43,50 @@ public class Usuario implements UserDetails {
         return senha;
     }
 
+    // =========================================================
+    // MÉTODOS DO USERDETAILS (O QUE O SPRING SECURITY LÊ)
+    // =========================================================
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
+        // Por enquanto, todos têm o mesmo nível de acesso.
+        // No futuro, se houver "ADMIN" e "VENDEDOR", a regra entra aqui.
         return List.of();
     }
 
     @Override
     public String getPassword() {
-        return "";
+        return this.senha; // APONTAMENTO CORRETO PARA A SENHA
     }
 
     @Override
     public String getUsername() {
-        return "";
+        return this.login; // APONTAMENTO CORRETO PARA O LOGIN
     }
 
     @Override
     public boolean isAccountNonExpired() {
-        return UserDetails.super.isAccountNonExpired();
+        return true; // Conta não expira
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return UserDetails.super.isAccountNonLocked();
+        return true; // Conta não está bloqueada
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return UserDetails.super.isCredentialsNonExpired();
+        return true; // Senha não expira
     }
 
     @Override
     public boolean isEnabled() {
-        return UserDetails.super.isEnabled();
+        return true; // Usuário está ativo
     }
+
+    // =========================================================
+    // EQUALS & HASHCODE
+    // =========================================================
 
     @Override
     public boolean equals(Object o) {
