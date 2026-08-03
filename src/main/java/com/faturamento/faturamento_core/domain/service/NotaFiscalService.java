@@ -56,20 +56,16 @@ public class NotaFiscalService {
         for (ItemNotaRequestDTO itemDto : request.itens()) {
             ItemNota item = itemDto.toEntity();
 
-            // Valor Bruto = (Valor Unitário * Quantidade)
             BigDecimal quantidade = BigDecimal.valueOf(item.getQuantidade());
             BigDecimal valorBrutoItem = item.getValorUnitario().multiply(quantidade);
 
-            // Valor dos Impostos = Valor Bruto * 0.23
             BigDecimal impostosItem = valorBrutoItem.multiply(aliquotaImpostos);
 
             // Valor Líquido = Valor Bruto - Impostos
             BigDecimal valorLiquidoItem = valorBrutoItem.subtract(impostosItem);
 
-            // Soma ao montante total da nota
             valorTotalLiquido = valorTotalLiquido.add(valorLiquidoItem);
 
-            // Associa o item à nota usando o método encapsulado que criamos na Fase 1
             nota.addItem(item);
         }
 
