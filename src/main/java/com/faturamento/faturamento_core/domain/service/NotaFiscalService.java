@@ -13,6 +13,7 @@ import com.faturamento.faturamento_core.domain.model.NotaFiscal;
 import com.faturamento.faturamento_core.domain.repository.EmpresaRepository;
 import com.faturamento.faturamento_core.domain.repository.NotaFiscalRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -28,6 +29,7 @@ public class NotaFiscalService {
         this.empresaRepository = empresaRepository;
     }
 
+    @Transactional
     public NotaFiscalResponseDTO emitirNota(NotaFiscalRequestDTO request) {
 
         Empresa empresa = empresaRepository.findById(request.empresaId())
