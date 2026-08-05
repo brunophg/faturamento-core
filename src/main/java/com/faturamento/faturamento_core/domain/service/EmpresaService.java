@@ -54,4 +54,10 @@ public class EmpresaService {
                 empresaSalva.getInscricaoEstadual()
         );
     }
+    @Transactional
+    public EmpresaResponseDTO atualizarEmpresa(Long id, EmpresaRequestDTO request) {
+        Empresa empresaExistente = empresaRepository.findById(id)
+                .orElseThrow(() -> new EmpresaNaoEncontradaException("Não existe uma empresa cadastrada com o Id: " + id));
+        if (!empresaExistente.getCnpj().equals(request.cnpj())
+    }
 }
