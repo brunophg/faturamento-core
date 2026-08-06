@@ -58,6 +58,17 @@ public class EmpresaService {
     public EmpresaResponseDTO atualizarEmpresa(Long id, EmpresaRequestDTO request) {
         Empresa empresaExistente = empresaRepository.findById(id)
                 .orElseThrow(() -> new EmpresaNaoEncontradaException("Não existe uma empresa cadastrada com o Id: " + id));
-        if (!empresaExistente.getCnpj().equals(request.cnpj())
+        if (!empresaExistente.getCnpj().equals(request.cnpj())) {
+            if (empresaRepository.existsByCnpj(request.cnpj())) {
+                throw new CnpjDuplicadoException("Ja existe outra empresa cadastrada com esse CNPJ")
+            }
+        }
+        empresaExistente.setRazaoSocial(request.razaoSocial());
+        empresaExistente.setCnpj(request.cnpj());
+        empresaExistente.setInscricaoEstadual(request.inscricaoEstadual());
+
+        Empresa empresaSalva = empresaRepository.save(empresaExistente);
+
+        return EmpresaResponseDTO.fromEntity(empresaSalva);
     }
 }
