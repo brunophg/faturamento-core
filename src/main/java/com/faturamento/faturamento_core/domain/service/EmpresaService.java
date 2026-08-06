@@ -10,7 +10,6 @@ import com.faturamento.faturamento_core.domain.repository.EmpresaRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.EnumMap;
 import java.util.List;
@@ -60,7 +59,7 @@ public class EmpresaService {
                 .orElseThrow(() -> new EmpresaNaoEncontradaException("Não existe uma empresa cadastrada com o Id: " + id));
         if (!empresaExistente.getCnpj().equals(request.cnpj())) {
             if (empresaRepository.existsByCnpj(request.cnpj())) {
-                throw new CnpjDuplicadoException("Ja existe outra empresa cadastrada com esse CNPJ")
+                throw new CnpjDuplicadoException("Ja existe outra empresa cadastrada com esse CNPJ");
             }
         }
         empresaExistente.setRazaoSocial(request.razaoSocial());
