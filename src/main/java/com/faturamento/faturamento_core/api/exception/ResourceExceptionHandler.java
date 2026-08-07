@@ -1,5 +1,6 @@
 package com.faturamento.faturamento_core.api.exception;
 
+import com.faturamento.faturamento_core.domain.exception.EmpresaNaoEncontradaException;
 import com.faturamento.faturamento_core.domain.exception.RegraNegocioException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
@@ -22,6 +23,22 @@ public class ResourceExceptionHandler {
                 Instant.now(),
                 status.value(),
                 e.getClass().getSimpleName(), // preenche com "CnpjInvalidoException" por exemplo
+                e.getMessage(),
+                request.getRequestURI()
+        );
+
+        return ResponseEntity.status(status).body(err);
+    }
+    // Captura especificamente o erro de ID não encontrado e devolve 404
+    @ExceptionHandler(EmpresaNaoEncontradaException.class)
+    public ResponseEntity<StandardError> handleNaoEncontrado(EmpresaNaoEncontradaException e, HttpServletRequest request) {
+
+        HttpStatus status = HttpStatus.NOT_FOUND;
+
+        StandardError err = new StandardError(
+                Instant.now(),
+                status.value(),
+                e.getClass().getSimpleName(),
                 e.getMessage(),
                 request.getRequestURI()
         );
