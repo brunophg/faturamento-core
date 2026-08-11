@@ -3,6 +3,7 @@ package com.faturamento.faturamento_core.api.exception;
 import com.faturamento.faturamento_core.domain.exception.EmpresaNaoEncontradaException;
 import com.faturamento.faturamento_core.domain.exception.RegraNegocioException;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -40,6 +41,21 @@ public class ResourceExceptionHandler {
                 status.value(),
                 e.getClass().getSimpleName(),
                 e.getMessage(),
+                request.getRequestURI()
+        );
+
+        return ResponseEntity.status(status).body(err);
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<StandardError> handleDataIntegrityViolation(DataIntegrityViolationException e, HttpServletRequest request) {
+        HttpStatus status = HttpStatus.CONFLICT;
+
+        StandardError err = new StandardError(
+                Instant.now(),
+                status.value(),
+                "Violação de Integridade de Dados",
+                "Não é possível excluir este registro, pois existem dados vinculados a ele (ex: notas fiscais).",
                 request.getRequestURI()
         );
 
