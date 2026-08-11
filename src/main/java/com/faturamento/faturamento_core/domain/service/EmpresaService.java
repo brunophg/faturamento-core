@@ -70,4 +70,12 @@ public class EmpresaService {
 
         return EmpresaResponseDTO.fromEntity(empresaSalva);
     }
+
+    @Transactional
+    public void excluirEmpresa(Long id) {
+        Empresa empresa = empresaRepository.findById(id)
+                .orElseThrow(() -> new EmpresaNaoEncontradaException("Empresa não encontrada com o Id: " + id));
+
+        empresaRepository.delete(empresa);
+    }
 }
