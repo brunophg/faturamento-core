@@ -53,4 +53,11 @@ public class EmpresaController {
         return ResponseEntity.status(HttpStatus.OK).body(empresaAtualizada);
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> excluir(@PathVariable long id) {
+        empresaService.excluirEmpresa(id);
+
+        return ResponseEntity.noContent().build();
+    }
+
 }
