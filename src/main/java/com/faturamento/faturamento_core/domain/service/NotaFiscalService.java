@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.List;
 
 @Service
 public class NotaFiscalService {
@@ -77,5 +78,19 @@ public class NotaFiscalService {
 
         NotaFiscal notaSalva = notaFiscalRepository.save(nota);
         return NotaFiscalResponseDTO.fromEntity(notaSalva);
+    }
+
+    public List<NotaFiscalResponseDTO> buscarPorEmpresa(long empresaId) {
+
+        if (!empresaRepository.existsById(empresaId)) {
+            throw new EmpresaNaoEncontradaException("Empresa emissora não encontrada com este Id: " + empresaId);
+        }
+
+        List<NotaFiscalResponseDTO> notas = notaFiscalRepository.findByEmpresaEmissoraId(empresaId)
+                .stream()
+                .map(NotaFiscalResponseDTO::fromEntity)
+                .toList();
+
+        return notas;
     }
 }
