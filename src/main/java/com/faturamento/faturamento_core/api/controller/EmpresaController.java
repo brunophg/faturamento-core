@@ -26,9 +26,9 @@ public class EmpresaController {
 
     @GetMapping
     public ResponseEntity<List<EmpresaResponseDTO>> listarTodas(){
-        List<EmpresaResponseDTO> lista = empresaService.listarTodos();
+        List<EmpresaResponseDTO> empresas = empresaService.listarTodos();
 
-        return ResponseEntity.ok().body(lista);
+        return ResponseEntity.ok().body(empresas);
     }
 
     @GetMapping("/{id}")
@@ -47,7 +47,7 @@ public class EmpresaController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<EmpresaResponseDTO> atualizar(@PathVariable long id, @RequestBody EmpresaRequestDTO request) {
+    public ResponseEntity<EmpresaResponseDTO> atualizar(@PathVariable long id, @RequestBody @Valid EmpresaRequestDTO request) {
         EmpresaResponseDTO empresaAtualizada = empresaService.atualizarEmpresa(id, request);
 
         return ResponseEntity.status(HttpStatus.OK).body(empresaAtualizada);
@@ -59,5 +59,4 @@ public class EmpresaController {
 
         return ResponseEntity.noContent().build();
     }
-
 }
