@@ -22,7 +22,7 @@ public class NotaFiscalController {
         this.notaFiscalService = notaFiscalService;
     }
 
-    @GetMapping("/empresa/{empresaId)")
+    @GetMapping("/empresa/{empresaId}")
     public ResponseEntity<List<NotaFiscalResponseDTO>> listarPorEmpresa(@PathVariable long empresaId) {
         List<NotaFiscalResponseDTO> notas = notaFiscalService.buscarPorEmpresa(empresaId);
 

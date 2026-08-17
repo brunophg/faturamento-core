@@ -23,7 +23,6 @@ public record NotaFiscalRequestDTO(
         Long empresaId,
 
         @NotEmpty(message = "A nota fiscal deve conter pelo menos um item.")
-        @Valid
         List <ItemNotaRequestDTO> itens
 ) {
     public NotaFiscal toEntity() {
