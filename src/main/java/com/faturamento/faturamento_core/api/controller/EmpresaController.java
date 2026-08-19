@@ -5,6 +5,7 @@ import com.faturamento.faturamento_core.domain.dto.empresa.EmpresaResponseDTO;
 import com.faturamento.faturamento_core.domain.model.Empresa;
 import com.faturamento.faturamento_core.domain.repository.EmpresaRepository;
 import com.faturamento.faturamento_core.domain.service.EmpresaService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
@@ -16,6 +17,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/empresas")
+@SecurityRequirement(name = "bearerAuth")
 public class EmpresaController {
 
     private final EmpresaService empresaService;

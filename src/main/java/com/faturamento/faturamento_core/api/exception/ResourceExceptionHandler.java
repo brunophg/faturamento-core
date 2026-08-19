@@ -15,7 +15,7 @@ import java.time.Instant;
 @ControllerAdvice
 public class ResourceExceptionHandler {
 
-    // Esse método único captura tanto o CnpjInvalido quanto a NotaDuplicada
+    //CnpjInvalido e NotaDuplicada
     @ExceptionHandler(RegraNegocioException.class)
     public ResponseEntity<StandardError> handleRegrasDeNegocio(RegraNegocioException e, HttpServletRequest request) {
 

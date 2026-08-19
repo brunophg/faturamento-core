@@ -3,6 +3,7 @@ package com.faturamento.faturamento_core.api.controller;
 import com.faturamento.faturamento_core.domain.dto.notafiscal.NotaFiscalRequestDTO;
 import com.faturamento.faturamento_core.domain.dto.notafiscal.NotaFiscalResponseDTO;
 import com.faturamento.faturamento_core.domain.service.NotaFiscalService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +15,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/notas")
+@SecurityRequirement(name = "bearerAuth")
 public class NotaFiscalController {
 
     private final NotaFiscalService notaFiscalService;
