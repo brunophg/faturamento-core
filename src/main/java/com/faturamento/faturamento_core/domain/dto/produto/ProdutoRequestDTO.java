@@ -5,6 +5,10 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 public record ProdutoRequestDTO(
+
+        @NotNull
+        String codigo,
+
         @NotBlank(message = "O nome do produto é obrigatorio")
         String nome,
 
@@ -15,6 +19,7 @@ public record ProdutoRequestDTO(
 ) {
     public Produto toEntity() {
         Produto produto = new Produto();
+        produto.setCodigo(this.codigo);
         produto.setNome(this.nome);
         produto.setDescricao(this.descricao);
         produto.setPreco(this.preco);

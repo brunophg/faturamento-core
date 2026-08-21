@@ -9,6 +9,9 @@ public class Produto {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "codigo", nullable = false)
+    private String codigo;
+
     @Column(name = "nome", nullable = false)
     private String nome;
 
@@ -17,6 +20,7 @@ public class Produto {
 
     @Column(name = "preco", nullable = false)
     private Double preco;
+
 
     @Column(nullable = false)
     private Boolean ativo = true;
@@ -70,5 +74,13 @@ public class Produto {
 
     public void setAtivo(Boolean ativo) {
         this.ativo = ativo;
+    }
+
+    public String getCodigo() {
+        return codigo;
+    }
+
+    public void setCodigo(String codigo) {
+        this.codigo = codigo;
     }
 }
