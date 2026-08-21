@@ -25,7 +25,9 @@ public class ProdutoService {
                 .stream()
                 .map(ProdutoResponseDTO::fromEntity)
                 .toList();
-    };
+        return lista;
+    }
+
 
     public ProdutoResponseDTO buscarPorId(long id) {
         Produto produto = produtoRepository.findById(id)
