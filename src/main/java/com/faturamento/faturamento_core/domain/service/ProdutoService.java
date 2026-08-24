@@ -2,6 +2,7 @@ package com.faturamento.faturamento_core.domain.service;
 
 import com.faturamento.faturamento_core.domain.dto.produto.ProdutoRequestDTO;
 import com.faturamento.faturamento_core.domain.dto.produto.ProdutoResponseDTO;
+import com.faturamento.faturamento_core.domain.dto.produto.ProdutoUpdateDTO;
 import com.faturamento.faturamento_core.domain.exception.ProdutoDuplicadoException;
 import com.faturamento.faturamento_core.domain.exception.ProdutoNaoEncontradoException;
 import com.faturamento.faturamento_core.domain.model.Produto;
@@ -54,5 +55,19 @@ public class ProdutoService {
                 produtoSalvo.getPreco(),
                 produtoSalvo.getAtivo()
         );
+    }
+
+    @Transactional
+    public ProdutoResponseDTO atualizarProduto(Long id, ProdutoUpdateDTO request) {
+        Produto produto = produtoRepository.findById(id)
+                .orElseThrow(() -> new ProdutoNaoEncontradoException("Não existe um produto cadastrado com o Id: " + id));
+
+        produto.setNome(request.nome());
+        produto.setDescricao(request.descricao());
+        produto.setPreco(request.preco());
+
+        Produto produtoAtualizado = produtoRepository.save(produto);
+
+        return ProdutoResponseDTO.fromEntity(produtoAtualizado);
     }
 }
