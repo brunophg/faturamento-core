@@ -70,4 +70,14 @@ public class ProdutoService {
 
         return ProdutoResponseDTO.fromEntity(produtoAtualizado);
     }
+
+    @Transactional
+    public void inativarProduto(Long id) {
+        Produto produto = produtoRepository.findById(id)
+                .orElseThrow(() -> new ProdutoNaoEncontradoException("Não existe um produto cadastrado com o Id: " + id));
+
+        produto.setAtivo(false);
+        produtoRepository.save(produto);
+    }
+
 }
