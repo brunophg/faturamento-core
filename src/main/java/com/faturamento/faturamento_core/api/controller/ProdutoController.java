@@ -44,8 +44,15 @@ public class ProdutoController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ProdutoResponseDTO> atualizar(@PathVariable long id, @RequestBody @Valid ProdutoUpdateDTO request) {
+    public ResponseEntity<ProdutoResponseDTO> atualizar(@PathVariable Long id, @RequestBody @Valid ProdutoUpdateDTO request) {
         ProdutoResponseDTO produto = produtoService.atualizarProduto(id, request);
         return ResponseEntity.ok(produto);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> inativar(@PathVariable Long id) {
+        produtoService.inativarProduto(id);
+
+        return ResponseEntity.noContent().build();
     }
 }
