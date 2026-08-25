@@ -22,7 +22,7 @@ public class ProdutoService {
     }
 
     public List<ProdutoResponseDTO> listarTodos() {
-        List<ProdutoResponseDTO> lista = produtoRepository.findAll()
+        List<ProdutoResponseDTO> lista = produtoRepository.findAllByAtivoTrue()
                 .stream()
                 .map(ProdutoResponseDTO::fromEntity)
                 .toList();
