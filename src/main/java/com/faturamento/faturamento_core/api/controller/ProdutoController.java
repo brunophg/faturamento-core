@@ -34,6 +34,11 @@ public class ProdutoController {
 
         return ResponseEntity.ok().body(produto);
     }
+    @GetMapping("/codigo/{codigo}")
+    public ResponseEntity<ProdutoResponseDTO> buscarPorCodigo(@PathVariable String codigo) {
+        ProdutoResponseDTO produto = produtoService.buscarPorCodigo(codigo);
+        return ResponseEntity.ok().body(produto);
+    }
 
     @PostMapping
     public ResponseEntity<ProdutoResponseDTO> adicionar(@RequestBody @Valid ProdutoRequestDTO request, UriComponentsBuilder uriBuilder) {

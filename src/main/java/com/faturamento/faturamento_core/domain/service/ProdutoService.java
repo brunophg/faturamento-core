@@ -80,4 +80,11 @@ public class ProdutoService {
         produtoRepository.save(produto);
     }
 
+    @Transactional
+    public ProdutoResponseDTO buscarPorCodigo(String codigo) {
+        Produto produto = produtoRepository.findByCodigo(codigo)
+                .orElseThrow(() -> new ProdutoNaoEncontradoException("Produto com código '" + codigo + "' não encontrado."));
+        return ProdutoResponseDTO.fromEntity(produto);
+    }
+
 }
