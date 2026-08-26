@@ -21,6 +21,7 @@ public class ProdutoService {
         this.produtoRepository = produtoRepository;
     }
 
+    @Transactional(readOnly = true)
     public List<ProdutoResponseDTO> listarTodos() {
         List<ProdutoResponseDTO> lista = produtoRepository.findAllByAtivoTrue()
                 .stream()
@@ -29,13 +30,19 @@ public class ProdutoService {
         return lista;
     }
 
-
+    @Transactional(readOnly = true)
     public ProdutoResponseDTO buscarPorId(long id) {
         Produto produto = produtoRepository.findById(id)
                 .orElseThrow(() -> new ProdutoNaoEncontradoException("Não existe um produto cadastrado com o Id: " + id));
         return ProdutoResponseDTO.fromEntity(produto);
     }
 
+    @Transactional(readOnly = true)
+    public ProdutoResponseDTO buscarPorCodigo(String codigo) {
+        Produto produto = produtoRepository.findByCodigo(codigo)
+                .orElseThrow(() -> new ProdutoNaoEncontradoException("Produto com código '" + codigo + "' não encontrado."));
+        return ProdutoResponseDTO.fromEntity(produto);
+    }
 
     @Transactional
     public ProdutoResponseDTO adicionarProduto(ProdutoRequestDTO request) {
@@ -81,10 +88,13 @@ public class ProdutoService {
     }
 
     @Transactional
-    public ProdutoResponseDTO buscarPorCodigo(String codigo) {
-        Produto produto = produtoRepository.findByCodigo(codigo)
-                .orElseThrow(() -> new ProdutoNaoEncontradoException("Produto com código '" + codigo + "' não encontrado."));
+    public ProdutoResponseDTO reativarProduto(Long id) {
+        Produto produto = produtoRepository.findById(id)
+                .orElseThrow(() -> new ProdutoNaoEncontradoException("Não existe um produto cadastrado com o Id: " + id));
+
+        produto.setAtivo(true);
+        produtoRepository.save(produto);
+
         return ProdutoResponseDTO.fromEntity(produto);
     }
-
 }

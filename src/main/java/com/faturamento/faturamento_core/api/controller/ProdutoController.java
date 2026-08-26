@@ -60,4 +60,11 @@ public class ProdutoController {
 
         return ResponseEntity.noContent().build();
     }
+
+    @PatchMapping("/{id}/reativar")
+    public ResponseEntity<ProdutoResponseDTO> reativar(@PathVariable long id) {
+        ProdutoResponseDTO produto = produtoService.reativarProduto(id);
+
+        return ResponseEntity.ok().body(produto);
+    }
 }
