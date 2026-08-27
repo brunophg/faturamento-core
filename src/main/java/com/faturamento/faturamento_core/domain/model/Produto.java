@@ -2,6 +2,8 @@ package com.faturamento.faturamento_core.domain.model;
 
 import jakarta.persistence.*;
 
+import java.math.BigDecimal;
+
 @Entity
 @Table(name = "tb_produto")
 public class Produto {
@@ -19,7 +21,7 @@ public class Produto {
     private String descricao;
 
     @Column(name = "preco", nullable = false)
-    private Double preco;
+    private BigDecimal preco;
 
 
     @Column(nullable = false)
@@ -29,7 +31,7 @@ public class Produto {
 
     }
 
-    public Produto(String nome, String descricao, Double preco) {
+    public Produto(String nome, String descricao, BigDecimal preco) {
         this.nome = nome;
         this.descricao = descricao;
         this.preco = preco;
@@ -60,11 +62,11 @@ public class Produto {
         this.descricao = descricao;
     }
 
-    public Double getPreco() {
+    public BigDecimal getPreco() {
         return preco;
     }
 
-    public void setPreco(Double preco) {
+    public void setPreco(BigDecimal preco) {
         this.preco = preco;
     }
 

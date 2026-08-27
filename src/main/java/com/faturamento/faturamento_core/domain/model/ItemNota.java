@@ -15,10 +15,6 @@ public class ItemNota {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message = "A descrição do item não pode estar vazia.")
-    @Column(name = "descricao", nullable = false)
-    private String descricao;
-
     @NotNull(message = "A quantidade do item não pode estar vazia.")
     @Column(name = "quantidade", nullable = false)
     private Integer quantidade;
@@ -32,15 +28,19 @@ public class ItemNota {
     @JoinColumn(name = "nota_fiscal_id", nullable = false)
     private NotaFiscal notaFiscal;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "produto_id", nullable = false)
+    private Produto produto;
+
     public ItemNota() {
 
     }
 
-    public ItemNota(String descricao, Integer quantidade, BigDecimal valorUnitario, NotaFiscal notaFiscal) {
-        this.descricao = descricao;
+    public ItemNota(String descricao, Integer quantidade, BigDecimal valorUnitario, NotaFiscal notaFiscal, Produto produto) {
         this.quantidade = quantidade;
         this.valorUnitario = valorUnitario;
         this.notaFiscal = notaFiscal;
+        this.produto = produto;
     }
 
     public Long getId() {
@@ -51,13 +51,7 @@ public class ItemNota {
         this.id = id;
     }
 
-    public String getDescricao() {
-        return descricao;
-    }
 
-    public void setDescricao(String descricao) {
-        this.descricao = descricao;
-    }
 
     public Integer getQuantidade() {
         return quantidade;
@@ -81,6 +75,14 @@ public class ItemNota {
 
     public void setNotaFiscal(NotaFiscal notaFiscal) {
         this.notaFiscal = notaFiscal;
+    }
+
+    public Produto getProduto() {
+        return produto;
+    }
+
+    public void setProduto(Produto produto) {
+        this.produto = produto;
     }
 
     @Override
