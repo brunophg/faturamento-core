@@ -6,12 +6,14 @@ import com.faturamento.faturamento_core.domain.dto.notafiscal.NotaFiscalResponse
 import com.faturamento.faturamento_core.domain.exception.CnpjInvalidoException;
 import com.faturamento.faturamento_core.domain.exception.EmpresaNaoEncontradaException;
 import com.faturamento.faturamento_core.domain.exception.NotaFiscalDuplicadaException;
-import com.faturamento.faturamento_core.domain.exception.RegraNegocioException;
+import com.faturamento.faturamento_core.domain.exception.ProdutoNaoEncontradoException;
 import com.faturamento.faturamento_core.domain.model.Empresa;
 import com.faturamento.faturamento_core.domain.model.ItemNota;
 import com.faturamento.faturamento_core.domain.model.NotaFiscal;
+import com.faturamento.faturamento_core.domain.model.Produto;
 import com.faturamento.faturamento_core.domain.repository.EmpresaRepository;
 import com.faturamento.faturamento_core.domain.repository.NotaFiscalRepository;
+import com.faturamento.faturamento_core.domain.repository.ProdutoRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,10 +26,12 @@ public class NotaFiscalService {
 
     private final NotaFiscalRepository notaFiscalRepository;
     private final EmpresaRepository empresaRepository;
+    private final ProdutoRepository produtoRepository;
 
-    public NotaFiscalService(NotaFiscalRepository notaFiscalRepository, EmpresaRepository empresaRepository) {
+    public NotaFiscalService(NotaFiscalRepository notaFiscalRepository, EmpresaRepository empresaRepository, ProdutoRepository produtoRepository) {
         this.notaFiscalRepository = notaFiscalRepository;
         this.empresaRepository = empresaRepository;
+        this.produtoRepository = produtoRepository;
     }
 
     @Transactional
@@ -57,11 +61,18 @@ public class NotaFiscalService {
         BigDecimal aliquotaImpostos = new BigDecimal("0.23");
 
         for (ItemNotaRequestDTO itemDto : request.itens()) {
-            ItemNota item = itemDto.toEntity();
+            Produto produto = produtoRepository.findById(itemDto.produtoId())
+                    .orElseThrow(() -> new ProdutoNaoEncontradoException("Produto não encontrado com este Id: " + itemDto.produtoId()));
+
+            ItemNota item = new ItemNota();
+            item.setQuantidade(itemDto.quantidade());
+            item.setProduto(produto);
+            item.setValorUnitario(produto.getPreco());
+            item.setNotaFiscal(nota);
+
 
             BigDecimal quantidade = BigDecimal.valueOf(item.getQuantidade());
             BigDecimal valorBrutoItem = item.getValorUnitario().multiply(quantidade);
-
             BigDecimal impostosItem = valorBrutoItem.multiply(aliquotaImpostos);
 
             // Valor Líquido = Valor Bruto - Impostos
