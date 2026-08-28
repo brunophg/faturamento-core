@@ -4,6 +4,8 @@ import com.faturamento.faturamento_core.domain.model.Produto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
+import java.math.BigDecimal;
+
 public record ProdutoRequestDTO(
 
         @NotNull
@@ -15,7 +17,7 @@ public record ProdutoRequestDTO(
         String descricao,
 
         @NotNull
-        Double preco
+        BigDecimal preco
 ) {
     public Produto toEntity() {
         Produto produto = new Produto();
