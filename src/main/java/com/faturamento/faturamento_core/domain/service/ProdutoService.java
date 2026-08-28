@@ -7,6 +7,8 @@ import com.faturamento.faturamento_core.domain.exception.ProdutoDuplicadoExcepti
 import com.faturamento.faturamento_core.domain.exception.ProdutoNaoEncontradoException;
 import com.faturamento.faturamento_core.domain.model.Produto;
 import com.faturamento.faturamento_core.domain.repository.ProdutoRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,12 +24,9 @@ public class ProdutoService {
     }
 
     @Transactional(readOnly = true)
-    public List<ProdutoResponseDTO> listarTodos() {
-        List<ProdutoResponseDTO> lista = produtoRepository.findAllByAtivoTrue()
-                .stream()
-                .map(ProdutoResponseDTO::fromEntity)
-                .toList();
-        return lista;
+    public Page<ProdutoResponseDTO> listarTodos(Pageable pageable) {
+        return produtoRepository.findAllByAtivoTrue(pageable)
+                .map(ProdutoResponseDTO::fromEntity);
     }
 
     @Transactional(readOnly = true)

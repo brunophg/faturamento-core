@@ -5,6 +5,9 @@ import com.faturamento.faturamento_core.domain.dto.notafiscal.NotaFiscalResponse
 import com.faturamento.faturamento_core.domain.service.NotaFiscalService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,8 +28,8 @@ public class NotaFiscalController {
     }
 
     @GetMapping("/empresa/{empresaId}")
-    public ResponseEntity<List<NotaFiscalResponseDTO>> listarPorEmpresa(@PathVariable long empresaId) {
-        List<NotaFiscalResponseDTO> notas = notaFiscalService.buscarPorEmpresa(empresaId);
+    public ResponseEntity<Page<NotaFiscalResponseDTO>> listarPorEmpresa(@PageableDefault(size = 20, page = 0, sort = "id")Pageable pageable, @PathVariable long empresaId) {
+        Page<NotaFiscalResponseDTO> notas = notaFiscalService.buscarPorEmpresa(pageable, empresaId);
 
         return ResponseEntity.status(HttpStatus.OK).body(notas);
     }

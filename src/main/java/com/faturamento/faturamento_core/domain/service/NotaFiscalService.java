@@ -14,6 +14,8 @@ import com.faturamento.faturamento_core.domain.model.Produto;
 import com.faturamento.faturamento_core.domain.repository.EmpresaRepository;
 import com.faturamento.faturamento_core.domain.repository.NotaFiscalRepository;
 import com.faturamento.faturamento_core.domain.repository.ProdutoRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -91,16 +93,14 @@ public class NotaFiscalService {
         return NotaFiscalResponseDTO.fromEntity(notaSalva);
     }
 
-    public List<NotaFiscalResponseDTO> buscarPorEmpresa(long empresaId) {
+    public Page<NotaFiscalResponseDTO> buscarPorEmpresa(Pageable pageable, long empresaId) {
 
         if (!empresaRepository.existsById(empresaId)) {
             throw new EmpresaNaoEncontradaException("Empresa emissora não encontrada com este Id: " + empresaId);
         }
 
-        List<NotaFiscalResponseDTO> notas = notaFiscalRepository.findByEmpresaEmissoraId(empresaId)
-                .stream()
-                .map(NotaFiscalResponseDTO::fromEntity)
-                .toList();
+        Page<NotaFiscalResponseDTO> notas = notaFiscalRepository.findByEmpresaEmissoraId(pageable, empresaId)
+                .map(NotaFiscalResponseDTO::fromEntity);
 
         return notas;
     }

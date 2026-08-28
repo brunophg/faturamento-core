@@ -4,7 +4,11 @@ import com.faturamento.faturamento_core.domain.dto.produto.ProdutoRequestDTO;
 import com.faturamento.faturamento_core.domain.dto.produto.ProdutoResponseDTO;
 import com.faturamento.faturamento_core.domain.dto.produto.ProdutoUpdateDTO;
 import com.faturamento.faturamento_core.domain.service.ProdutoService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -13,6 +17,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/produtos")
+@SecurityRequirement(name = "bearerAuth")
 public class ProdutoController {
 
     private final ProdutoService produtoService;
@@ -22,8 +27,9 @@ public class ProdutoController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ProdutoResponseDTO>> listarTodos() {
-        List<ProdutoResponseDTO> produtos = produtoService.listarTodos();
+    public ResponseEntity<Page<ProdutoResponseDTO>> listarTodos(@PageableDefault(size = 20, page = 0, sort = "nome")
+                                                                    Pageable pageable) {
+        Page<ProdutoResponseDTO> produtos = produtoService.listarTodos(pageable);
 
         return ResponseEntity.ok().body(produtos);
     }
