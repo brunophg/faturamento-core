@@ -7,6 +7,8 @@ import com.faturamento.faturamento_core.domain.exception.CnpjInvalidoException;
 import com.faturamento.faturamento_core.domain.exception.EmpresaNaoEncontradaException;
 import com.faturamento.faturamento_core.domain.model.Empresa;
 import com.faturamento.faturamento_core.domain.repository.EmpresaRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,11 +26,10 @@ public class EmpresaService {
         this.empresaRepository = empresaRepository;
     }
 
-    public List<EmpresaResponseDTO> listarTodos() {
-        return empresaRepository.findAll()
-                .stream()
-                .map(EmpresaResponseDTO::fromEntity)
-                .toList();
+    @Transactional(readOnly = true)
+    public Page<EmpresaResponseDTO> listarTodos(Pageable pageable) {
+        return empresaRepository.findAllByAtivoTrue(pageable)
+                .map(EmpresaResponseDTO::fromEntity);
     }
 
     public EmpresaResponseDTO buscarPorId(long id) {
@@ -72,10 +73,11 @@ public class EmpresaService {
     }
 
     @Transactional
-    public void excluirEmpresa(Long id) {
+    public void inativarEmpresa(Long id) {
         Empresa empresa = empresaRepository.findById(id)
                 .orElseThrow(() -> new EmpresaNaoEncontradaException("Empresa não encontrada com o Id: " + id));
 
-        empresaRepository.delete(empresa);
+        empresa.setAtivo(false);
+        empresaRepository.save(empresa);
     }
 }

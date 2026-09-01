@@ -31,6 +31,10 @@
         @OneToMany(mappedBy = "empresaEmissora")
         private List<NotaFiscal> notasEmitidas = new ArrayList<>();
 
+        @Column(nullable = false)
+        private Boolean ativo = true;
+
+
         public Empresa() {
 
         }
@@ -38,6 +42,7 @@
             this.razaoSocial = razaoSocial;
             this.cnpj = cnpj;
             this.inscricaoEstadual = inscricaoEstadual;
+            this.ativo = true;
         }
 
         public Long getId() {
@@ -78,6 +83,14 @@
 
         public void setNotasEmitidas(List<NotaFiscal> notasEmitidas) {
             this.notasEmitidas = notasEmitidas;
+        }
+
+        public Boolean getAtivo() {
+            return ativo;
+        }
+
+        public void setAtivo(Boolean ativo) {
+            this.ativo = ativo;
         }
 
         @Override

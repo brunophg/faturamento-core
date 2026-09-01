@@ -57,7 +57,7 @@ public class EmpresaController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> excluir(@PathVariable long id) {
-        empresaService.excluirEmpresa(id);
+        empresaService.inativarEmpresa(id);
 
         return ResponseEntity.noContent().build();
     }
