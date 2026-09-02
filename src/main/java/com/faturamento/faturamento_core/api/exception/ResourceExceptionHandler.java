@@ -1,9 +1,6 @@
 package com.faturamento.faturamento_core.api.exception;
 
-import com.faturamento.faturamento_core.domain.exception.EmpresaNaoEncontradaException;
-import com.faturamento.faturamento_core.domain.exception.ProdutoDuplicadoException;
-import com.faturamento.faturamento_core.domain.exception.ProdutoNaoEncontradoException;
-import com.faturamento.faturamento_core.domain.exception.RegraNegocioException;
+import com.faturamento.faturamento_core.domain.exception.*;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -17,7 +14,7 @@ import java.time.Instant;
 @ControllerAdvice
 public class ResourceExceptionHandler {
 
-    //CnpjInvalido e NotaDuplicada
+    //CnpjInvalido
     @ExceptionHandler(RegraNegocioException.class)
     public ResponseEntity<StandardError> handleRegrasDeNegocio(RegraNegocioException e, HttpServletRequest request) {
 
@@ -33,9 +30,25 @@ public class ResourceExceptionHandler {
 
         return ResponseEntity.status(status).body(err);
     }
+
+    @ExceptionHandler({CnpjDuplicadoException.class, NotaFiscalDuplicadaException.class})
+    public ResponseEntity<StandardError> handleDuplicidade(RegraNegocioException e, HttpServletRequest request) {
+        HttpStatus status = HttpStatus.CONFLICT;
+
+        StandardError err = new StandardError(
+                Instant.now(),
+                status.value(),
+                e.getClass().getSimpleName(),
+                e.getMessage(),
+                request.getRequestURI()
+        );
+
+        return ResponseEntity.status(status).body(err);
+    }
+
     // Captura especificamente o erro de ID não encontrado e devolve 404
     @ExceptionHandler(EmpresaNaoEncontradaException.class)
-    public ResponseEntity<StandardError> handleNaoEncontrado(EmpresaNaoEncontradaException e, HttpServletRequest request) {
+    public ResponseEntity<StandardError> handleEmpresaNaoEncontrada(EmpresaNaoEncontradaException e, HttpServletRequest request) {
 
         HttpStatus status = HttpStatus.NOT_FOUND;
 
