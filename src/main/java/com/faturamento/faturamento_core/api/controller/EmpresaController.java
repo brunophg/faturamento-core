@@ -8,6 +8,8 @@ import com.faturamento.faturamento_core.domain.service.EmpresaService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.apache.coyote.Response;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,8 +29,8 @@ public class EmpresaController {
     }
 
     @GetMapping
-    public ResponseEntity<List<EmpresaResponseDTO>> listarTodas(){
-        List<EmpresaResponseDTO> empresas = empresaService.listarTodos();
+    public ResponseEntity<Page<EmpresaResponseDTO>> listarTodas(Pageable pageable){
+        Page<EmpresaResponseDTO> empresas = empresaService.listarTodos(pageable);
 
         return ResponseEntity.ok().body(empresas);
     }
