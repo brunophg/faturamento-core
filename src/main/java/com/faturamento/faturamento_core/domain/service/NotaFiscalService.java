@@ -3,10 +3,8 @@ package com.faturamento.faturamento_core.domain.service;
 import com.faturamento.faturamento_core.domain.dto.itemnota.ItemNotaRequestDTO;
 import com.faturamento.faturamento_core.domain.dto.notafiscal.NotaFiscalRequestDTO;
 import com.faturamento.faturamento_core.domain.dto.notafiscal.NotaFiscalResponseDTO;
-import com.faturamento.faturamento_core.domain.exception.CnpjInvalidoException;
-import com.faturamento.faturamento_core.domain.exception.EmpresaNaoEncontradaException;
-import com.faturamento.faturamento_core.domain.exception.NotaFiscalDuplicadaException;
-import com.faturamento.faturamento_core.domain.exception.ProdutoNaoEncontradoException;
+import com.faturamento.faturamento_core.domain.enums.StatusNota;
+import com.faturamento.faturamento_core.domain.exception.*;
 import com.faturamento.faturamento_core.domain.model.Empresa;
 import com.faturamento.faturamento_core.domain.model.ItemNota;
 import com.faturamento.faturamento_core.domain.model.NotaFiscal;
@@ -103,5 +101,31 @@ public class NotaFiscalService {
                 .map(NotaFiscalResponseDTO::fromEntity);
 
         return notas;
+    }
+
+    @Transactional
+    public NotaFiscalResponseDTO concluirEmissão(Long id) {
+        NotaFiscal nota = notaFiscalRepository.findById(id)
+                .orElseThrow(() -> new NotaFiscalNaoEncontradaException("Nota Fiscal não encontrada com este Id: " + id));
+
+        if (nota.getStatus() != StatusNota.PROCESSANDO) {
+            throw new StatusNotaInvalidoException("Apenas notas com status PROCESSANDO podem ser emitidas.");
+        }
+
+        nota.setStatus(StatusNota.EMITIDA);
+        return NotaFiscalResponseDTO.fromEntity(nota);
+    }
+
+    @Transactional
+    public NotaFiscalResponseDTO cancelar(Long id) {
+        NotaFiscal nota = notaFiscalRepository.findById(id)
+                .orElseThrow(() -> new NotaFiscalNaoEncontradaException("Nota Fiscal não encontrada."));
+
+        if (nota.getStatus() == StatusNota.CANCELADA) {
+            throw new NotaFiscalNaoEncontradaException("Esta nota fiscal já encontra-se cancelada.");
+        }
+
+        nota.setStatus(StatusNota.CANCELADA);
+        return NotaFiscalResponseDTO.fromEntity(nota);
     }
 }

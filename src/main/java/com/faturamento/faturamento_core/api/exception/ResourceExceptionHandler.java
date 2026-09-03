@@ -95,17 +95,24 @@ public class ResourceExceptionHandler {
         return ResponseEntity.status(status).body(err);
     }
 
+    @ExceptionHandler(NotaFiscalNaoEncontradaException.class)
+    public ResponseEntity<StandardError> handleNotaNaoEncontrada(NotaFiscalNaoEncontradaException e, HttpServletRequest request) {
+        HttpStatus status = HttpStatus.NOT_FOUND;
+        StandardError err = new StandardError(Instant.now(), status.value(), e.getClass().getSimpleName(), e.getMessage(), request.getRequestURI());
+        return ResponseEntity.status(status).body(err);
+    }
+
     @ExceptionHandler(ProdutoNaoEncontradoException.class)
     public ResponseEntity<StandardError> handleProdutoNaoEncontrado(ProdutoNaoEncontradoException e, HttpServletRequest request) {
         HttpStatus status = HttpStatus.NOT_FOUND;
-        StandardError err = new StandardError(Instant.now(), status.value(), "Produto não encontrado", e.getMessage(), request.getRequestURI());
+        StandardError err = new StandardError(Instant.now(), status.value(), e.getClass().getSimpleName(), e.getMessage(), request.getRequestURI());
         return ResponseEntity.status(status).body(err);
     }
 
     @ExceptionHandler(ProdutoDuplicadoException.class)
     public ResponseEntity<StandardError> handleProdutoDuplicado(ProdutoDuplicadoException e, HttpServletRequest request) {
         HttpStatus status = HttpStatus.CONFLICT;
-        StandardError err = new StandardError(Instant.now(), status.value(), "Produto ja existe", e.getMessage(), request.getRequestURI());
+        StandardError err = new StandardError(Instant.now(), status.value(), e.getClass().getSimpleName(), e.getMessage(), request.getRequestURI());
         return ResponseEntity.status(status).body(err);
     }
 }
