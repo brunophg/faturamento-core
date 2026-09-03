@@ -8,10 +8,4 @@ public record ItemNotaRequestDTO(
         Long produtoId,
         Integer quantidade,
         BigDecimal valorUnitario
-) {
-    public ItemNota toEntity() {
-        ItemNota item = new ItemNota();
-        item.setQuantidade(this.quantidade);
-        return item;
-    }
-}
+) {}
