@@ -1,5 +1,6 @@
 package com.faturamento.faturamento_core.domain.repository;
 
+import com.faturamento.faturamento_core.domain.model.Empresa;
 import com.faturamento.faturamento_core.domain.model.Produto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -16,4 +17,7 @@ public interface ProdutoRepository extends JpaRepository<Produto, Long> {
     Page<Produto> findAllByAtivoTrue(Pageable pageable);
 
     Optional<Produto> findByCodigo(String codigo);
+
+    Optional<Produto> findByIdAtivoTrue(Long id);
+
 }
