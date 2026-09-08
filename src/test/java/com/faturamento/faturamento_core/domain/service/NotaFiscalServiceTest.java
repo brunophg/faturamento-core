@@ -57,7 +57,6 @@ class NotaFiscalServiceTest {
 
         // Construtor do Request usando 12345L (Long) para alinhar com o repositório
         NotaFiscalRequestDTO request = new NotaFiscalRequestDTO(12345L, LocalDateTime.now(), 1L, List.of(itemRequest));
-
         NotaFiscal notaSalvaMock = new NotaFiscal();
         notaSalvaMock.setId(500L);
         notaSalvaMock.setStatus(StatusNota.PROCESSANDO);
