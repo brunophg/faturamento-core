@@ -33,7 +33,7 @@ public class EmpresaService {
     }
 
     public EmpresaResponseDTO buscarPorId(long id) {
-        Empresa empresa = empresaRepository.findById(id)
+        Empresa empresa = empresaRepository.findByIdAtivoTrue(id)
                 .orElseThrow(() -> new EmpresaNaoEncontradaException("Não existe uma empresa cadastrada com o Id: " + id));
         return EmpresaResponseDTO.fromEntity(empresa);
 

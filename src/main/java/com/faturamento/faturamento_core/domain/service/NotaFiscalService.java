@@ -37,7 +37,7 @@ public class NotaFiscalService {
     @Transactional
     public NotaFiscalResponseDTO emitirNota(NotaFiscalRequestDTO request) {
 
-        Empresa empresa = empresaRepository.findById(request.empresaId())
+        Empresa empresa = empresaRepository.findByIdAtivoTrue(request.empresaId())
                 .orElseThrow(() -> new EmpresaNaoEncontradaException("Empresa emissora não encontrada com este Id: " + request.empresaId()));
 
         // RN1 -> Valida CNPJ nulo / formato com 14 digitos
@@ -61,7 +61,7 @@ public class NotaFiscalService {
         BigDecimal aliquotaImpostos = new BigDecimal("0.23");
 
         for (ItemNotaRequestDTO itemDto : request.itens()) {
-            Produto produto = produtoRepository.findById(itemDto.produtoId())
+            Produto produto = produtoRepository.findByIdAtivoTrue(itemDto.produtoId())
                     .orElseThrow(() -> new ProdutoNaoEncontradoException("Produto não encontrado com este Id: " + itemDto.produtoId()));
 
             ItemNota item = new ItemNota();

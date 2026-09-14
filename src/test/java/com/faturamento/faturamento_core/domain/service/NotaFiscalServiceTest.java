@@ -45,7 +45,7 @@ class NotaFiscalServiceTest {
         // 1. Cenário (Arrange)
         Empresa empresaMock = new Empresa();
         empresaMock.setId(1L);
-        empresaMock.setCnpj("12.345.678/0001-99");
+        empresaMock.setCnpj("12345678000199");
         empresaMock.setAtivo(true);
 
         Produto produtoMock = new Produto();
@@ -68,8 +68,7 @@ class NotaFiscalServiceTest {
 
         when(produtoRepository.findByIdAtivoTrue(10L)).thenReturn(Optional.of(produtoMock));
 
-        when(notaFiscalRepository.save(any(NotaFiscal.class))).thenReturn(notaSalvaMock);
-
+        when(notaFiscalRepository.save(any(NotaFiscal.class))).thenAnswer(invocation -> invocation.getArgument(0));
         // ação (
         NotaFiscalResponseDTO response = notaFiscalService.emitirNota(request);
 
