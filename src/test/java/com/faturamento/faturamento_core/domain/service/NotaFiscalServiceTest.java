@@ -17,6 +17,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -41,7 +45,7 @@ class NotaFiscalServiceTest {
     @InjectMocks
     private NotaFiscalService notaFiscalService;
 
-    private Empresa empresaValidaEAtiva() {
+    private Empresa empresaAtiva() {
         Empresa empresa = new Empresa();
         empresa.setId(1L);
         empresa.setCnpj("12345678000199");
@@ -62,7 +66,7 @@ class NotaFiscalServiceTest {
     @Test
     @DisplayName("Deve emitir nota com sucesso, ignorar o valor unitário do request e calcular 23% de impostos")
     void deveEmitirNotaComSucessoECalcularImpostos() {
-        Empresa empresaMock = empresaValidaEAtiva();
+        Empresa empresaMock = empresaAtiva();
         Produto produtoMock = produtoAtivo(10L, "100.00");
 
         // Erro provocado mandando um valor unitário de 10.00 — o service deve ignorar isso
@@ -89,7 +93,7 @@ class NotaFiscalServiceTest {
     @Test
     @DisplayName("Deve somar corretamente o valor líquido de múltiplos itens de produtos diferentes")
     void deveCalcularValorTotalComMultiplosItens() {
-        Empresa empresaMock = empresaValidaEAtiva();
+        Empresa empresaMock = empresaAtiva();
         Produto produtoA = produtoAtivo(10L, "100.00"); // 3x => bruto 300.00 -> líquido 231.00
         Produto produtoB = produtoAtivo(20L, "50.00");  // 1x => bruto 50.00  -> líquido 38.50
 
@@ -130,7 +134,7 @@ class NotaFiscalServiceTest {
     @Test
     @DisplayName("RN1: deve lançar CnpjInvalidoException quando o CNPJ da empresa é nulo")
     void deveLancarExcecaoQuandoCnpjNulo() {
-        Empresa empresaMock = empresaValidaEAtiva();
+        Empresa empresaMock = empresaAtiva();
         empresaMock.setCnpj(null);
 
         NotaFiscalRequestDTO request = new NotaFiscalRequestDTO(12345L, LocalDateTime.now(), 1L, List.of());
@@ -143,7 +147,7 @@ class NotaFiscalServiceTest {
     @Test
     @DisplayName("RN1: deve lançar CnpjInvalidoException quando o CNPJ está formatado com máscara em vez de só dígitos")
     void deveLancarExcecaoQuandoCnpjComMascara() {
-        Empresa empresaMock = empresaValidaEAtiva();
+        Empresa empresaMock = empresaAtiva();
         empresaMock.setCnpj("12.345.678/0001-99"); // formato inválido para a regra ^\d{14}$
 
         NotaFiscalRequestDTO request = new NotaFiscalRequestDTO(12345L, LocalDateTime.now(), 1L, List.of());
@@ -157,7 +161,7 @@ class NotaFiscalServiceTest {
     @Test
     @DisplayName("RN2: deve lançar NotaFiscalDuplicadaException quando já existe nota com esse número para a empresa")
     void deveLancarExcecaoQuandoNotaDuplicada() {
-        Empresa empresaMock = empresaValidaEAtiva();
+        Empresa empresaMock = empresaAtiva();
         NotaFiscalRequestDTO request = new NotaFiscalRequestDTO(12345L, LocalDateTime.now(), 1L, List.of());
 
         when(empresaRepository.findByIdAtivoTrue(1L)).thenReturn(Optional.of(empresaMock));
@@ -175,7 +179,7 @@ class NotaFiscalServiceTest {
     @Test
     @DisplayName("Deve lançar ProdutoNaoEncontradoException quando um item referencia produto inexistente ou inativo")
     void deveLancarExcecaoQuandoProdutoNaoEncontrado() {
-        Empresa empresaMock = empresaValidaEAtiva();
+        Empresa empresaMock = empresaAtiva();
         ItemNotaRequestDTO itemRequest = new ItemNotaRequestDTO(999L, 1, null);
         NotaFiscalRequestDTO request = new NotaFiscalRequestDTO(12345L, LocalDateTime.now(), 1L, List.of(itemRequest));
 
@@ -194,7 +198,7 @@ class NotaFiscalServiceTest {
         NotaFiscal nota = new NotaFiscal();
         nota.setId(1L);
         nota.setStatus(StatusNota.PROCESSANDO);
-        nota.setEmpresaEmissora(empresaValidaEAtiva());
+        nota.setEmpresaEmissora(empresaAtiva());
         nota.setValorTotal(new BigDecimal("100.00"));
 
         when(notaFiscalRepository.findById(1L)).thenReturn(Optional.of(nota));
@@ -231,7 +235,7 @@ class NotaFiscalServiceTest {
         NotaFiscal nota = new NotaFiscal();
         nota.setId(1L);
         nota.setStatus(StatusNota.PROCESSANDO);
-        nota.setEmpresaEmissora(empresaValidaEAtiva());
+        nota.setEmpresaEmissora(empresaAtiva());
         nota.setValorTotal(new BigDecimal("100.00"));
 
         when(notaFiscalRepository.findById(1L)).thenReturn(Optional.of(nota));
@@ -251,5 +255,39 @@ class NotaFiscalServiceTest {
         when(notaFiscalRepository.findById(1L)).thenReturn(Optional.of(nota));
 
         assertThrows(NotaFiscalNaoEncontradaException.class, () -> notaFiscalService.cancelar(1L));
+    }
+
+    @Test
+    void deveLancarExcecaoAoBuscarPorEmpresaInexistente() {
+        Pageable pageable = PageRequest.of(0,10);
+        long empresaId = 999;
+
+        assertThrows(EmpresaNaoEncontradaException.class, () -> notaFiscalService.buscarPorEmpresa(pageable, empresaId));
+        verify(notaFiscalRepository, never()).findByEmpresaEmissoraId(any(), anyLong());
+    }
+
+    @Test
+    void deveRetornarNotasPorEmpresaComSucesso() {
+        Pageable pageable = PageRequest.of(0, 10);
+        long empresaId = 1;
+
+        NotaFiscal nota = new NotaFiscal();
+        nota.setId(empresaId);
+        nota.setNumeroNota(2321L);
+        nota.setStatus(StatusNota.PROCESSANDO);
+        nota.setValorTotal(BigDecimal.valueOf(2000));
+        nota.setEmpresaEmissora(empresaAtiva());
+
+        Page<NotaFiscal> paginaMock = new PageImpl<>(List.of(nota), pageable, 1);
+
+        when(empresaRepository.existsById(empresaId)).thenReturn(true);
+        when(notaFiscalRepository.findByEmpresaEmissoraId(pageable, empresaId)).thenReturn(paginaMock);
+
+        Page<NotaFiscalResponseDTO> resultado = notaFiscalService.buscarPorEmpresa(pageable, empresaId);
+
+        assertEquals(1, resultado.getContent().size());
+        assertEquals(12345L, resultado.getContent().get(0).numeroNota());
+        assertEquals(new BigDecimal("154.00"), resultado.getContent().get(0).valorTotal());
+        verify(notaFiscalRepository, times(1)).findByEmpresaEmissoraId(pageable, empresaId);
     }
 }
