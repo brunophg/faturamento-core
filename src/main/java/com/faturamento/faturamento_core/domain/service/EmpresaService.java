@@ -33,7 +33,7 @@ public class EmpresaService {
     }
 
     public EmpresaResponseDTO buscarPorId(long id) {
-        Empresa empresa = empresaRepository.findByIdAtivoTrue(id)
+        Empresa empresa = empresaRepository.findById(id)
                 .orElseThrow(() -> new EmpresaNaoEncontradaException("Não existe uma empresa cadastrada com o Id: " + id));
         return EmpresaResponseDTO.fromEntity(empresa);
 
@@ -47,12 +47,7 @@ public class EmpresaService {
         Empresa novaEmpresa = request.toEntity();
 
         Empresa empresaSalva = empresaRepository.save(novaEmpresa);
-        return new EmpresaResponseDTO(
-                empresaSalva.getId(),
-                empresaSalva.getCnpj(),
-                empresaSalva.getRazaoSocial(),
-                empresaSalva.getInscricaoEstadual()
-        );
+        return EmpresaResponseDTO.fromEntity(empresaSalva);
     }
     @Transactional
     public EmpresaResponseDTO atualizarEmpresa(Long id, EmpresaRequestDTO request) {
