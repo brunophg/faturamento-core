@@ -115,4 +115,11 @@ public class ResourceExceptionHandler {
         StandardError err = new StandardError(Instant.now(), status.value(), e.getClass().getSimpleName(), e.getMessage(), request.getRequestURI());
         return ResponseEntity.status(status).body(err);
     }
+
+    @ExceptionHandler(StatusNotaInvalidoException.class)
+    public ResponseEntity<StandardError> handleStatusNotaInvalido(StatusNotaInvalidoException e, HttpServletRequest request) {
+        HttpStatus status = HttpStatus.CONFLICT;
+        StandardError err = new StandardError(Instant.now(), status.value(), e.getClass().getSimpleName(), e.getMessage(), request.getRequestURI());
+        return ResponseEntity.status(status).body(err);
+    }
 }

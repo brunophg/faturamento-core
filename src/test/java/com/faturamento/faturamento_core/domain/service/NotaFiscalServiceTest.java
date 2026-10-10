@@ -254,7 +254,7 @@ class NotaFiscalServiceTest {
 
         when(notaFiscalRepository.findById(1L)).thenReturn(Optional.of(nota));
 
-        assertThrows(NotaFiscalNaoEncontradaException.class, () -> notaFiscalService.cancelar(1L));
+        assertThrows(StatusNotaInvalidoException.class, () -> notaFiscalService.cancelar(1L));
     }
 
     @Test

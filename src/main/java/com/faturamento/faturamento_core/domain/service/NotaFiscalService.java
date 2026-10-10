@@ -121,7 +121,7 @@ public class NotaFiscalService {
                 .orElseThrow(() -> new NotaFiscalNaoEncontradaException("Nota Fiscal não encontrada."));
 
         if (nota.getStatus() == StatusNota.CANCELADA) {
-            throw new NotaFiscalNaoEncontradaException("Esta nota fiscal já encontra-se cancelada.");
+            throw new StatusNotaInvalidoException("Esta nota fiscal já encontra-se cancelada.");
         }
 
         nota.setStatus(StatusNota.CANCELADA);
