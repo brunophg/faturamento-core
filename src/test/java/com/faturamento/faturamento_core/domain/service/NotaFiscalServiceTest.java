@@ -61,7 +61,7 @@ class NotaFiscalServiceTest {
         return produto;
     }
 
-    // ---------- emitirNota: caminho feliz ----------
+    //  emitirNota: caminho feliz
 
     @Test
     @DisplayName("Deve emitir nota com sucesso, ignorar o valor unitário do request e calcular 23% de impostos")
@@ -74,9 +74,9 @@ class NotaFiscalServiceTest {
         ItemNotaRequestDTO itemRequest = new ItemNotaRequestDTO(10L, 2, new BigDecimal("10.00"));
         NotaFiscalRequestDTO request = new NotaFiscalRequestDTO(12345L, LocalDateTime.now(), 1L, List.of(itemRequest));
 
-        when(empresaRepository.findByIdAtivoTrue(1L)).thenReturn(Optional.of(empresaMock));
+        when(empresaRepository.findByIdAndAtivoTrue(1L)).thenReturn(Optional.of(empresaMock));
         when(notaFiscalRepository.existsByNumeroNotaAndEmpresaEmissoraId(12345L, 1L)).thenReturn(false);
-        when(produtoRepository.findByIdAtivoTrue(10L)).thenReturn(Optional.of(produtoMock));
+        when(produtoRepository.findByIdAndAtivoTrue(10L)).thenReturn(Optional.of(produtoMock));
         when(notaFiscalRepository.save(any(NotaFiscal.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         NotaFiscalResponseDTO response = notaFiscalService.emitirNota(request);
@@ -101,10 +101,10 @@ class NotaFiscalServiceTest {
         ItemNotaRequestDTO itemB = new ItemNotaRequestDTO(20L, 1, null);
         NotaFiscalRequestDTO request = new NotaFiscalRequestDTO(12346L, LocalDateTime.now(), 1L, List.of(itemA, itemB));
 
-        when(empresaRepository.findByIdAtivoTrue(1L)).thenReturn(Optional.of(empresaMock));
+        when(empresaRepository.findByIdAndAtivoTrue(1L)).thenReturn(Optional.of(empresaMock));
         when(notaFiscalRepository.existsByNumeroNotaAndEmpresaEmissoraId(12346L, 1L)).thenReturn(false);
-        when(produtoRepository.findByIdAtivoTrue(10L)).thenReturn(Optional.of(produtoA));
-        when(produtoRepository.findByIdAtivoTrue(20L)).thenReturn(Optional.of(produtoB));
+        when(produtoRepository.findByIdAndAtivoTrue(10L)).thenReturn(Optional.of(produtoA));
+        when(produtoRepository.findByIdAndAtivoTrue(20L)).thenReturn(Optional.of(produtoB));
         when(notaFiscalRepository.save(any(NotaFiscal.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         NotaFiscalResponseDTO response = notaFiscalService.emitirNota(request);
@@ -120,7 +120,7 @@ class NotaFiscalServiceTest {
     void deveLancarExcecaoQuandoEmpresaNaoEncontrada() {
         NotaFiscalRequestDTO request = new NotaFiscalRequestDTO(12345L, LocalDateTime.now(), 999L, List.of());
 
-        when(empresaRepository.findByIdAtivoTrue(999L)).thenReturn(Optional.empty());
+        when(empresaRepository.findByIdAndAtivoTrue(999L)).thenReturn(Optional.empty());
 
         assertThrows(EmpresaNaoEncontradaException.class, () -> notaFiscalService.emitirNota(request));
 
@@ -129,7 +129,7 @@ class NotaFiscalServiceTest {
         verify(notaFiscalRepository, never()).save(any());
     }
 
-    // ---------- emitirNota: RN1 (CNPJ) ----------
+    //  emitirNota: RN CNPJ
 
     @Test
     @DisplayName("RN1: deve lançar CnpjInvalidoException quando o CNPJ da empresa é nulo")
@@ -138,7 +138,7 @@ class NotaFiscalServiceTest {
         empresaMock.setCnpj(null);
 
         NotaFiscalRequestDTO request = new NotaFiscalRequestDTO(12345L, LocalDateTime.now(), 1L, List.of());
-        when(empresaRepository.findByIdAtivoTrue(1L)).thenReturn(Optional.of(empresaMock));
+        when(empresaRepository.findByIdAndAtivoTrue(1L)).thenReturn(Optional.of(empresaMock));
 
         assertThrows(CnpjInvalidoException.class, () -> notaFiscalService.emitirNota(request));
         verify(notaFiscalRepository, never()).save(any());
@@ -151,12 +151,12 @@ class NotaFiscalServiceTest {
         empresaMock.setCnpj("12.345.678/0001-99"); // formato inválido para a regra ^\d{14}$
 
         NotaFiscalRequestDTO request = new NotaFiscalRequestDTO(12345L, LocalDateTime.now(), 1L, List.of());
-        when(empresaRepository.findByIdAtivoTrue(1L)).thenReturn(Optional.of(empresaMock));
+        when(empresaRepository.findByIdAndAtivoTrue(1L)).thenReturn(Optional.of(empresaMock));
 
         assertThrows(CnpjInvalidoException.class, () -> notaFiscalService.emitirNota(request));
     }
 
-    // ---------- emitirNota: RN2 (duplicidade) ----------
+    // emitirNota: RN2 duplicidade
 
     @Test
     @DisplayName("RN2: deve lançar NotaFiscalDuplicadaException quando já existe nota com esse número para a empresa")
@@ -164,17 +164,17 @@ class NotaFiscalServiceTest {
         Empresa empresaMock = empresaAtiva();
         NotaFiscalRequestDTO request = new NotaFiscalRequestDTO(12345L, LocalDateTime.now(), 1L, List.of());
 
-        when(empresaRepository.findByIdAtivoTrue(1L)).thenReturn(Optional.of(empresaMock));
+        when(empresaRepository.findByIdAndAtivoTrue(1L)).thenReturn(Optional.of(empresaMock));
         when(notaFiscalRepository.existsByNumeroNotaAndEmpresaEmissoraId(12345L, 1L)).thenReturn(true);
 
         assertThrows(NotaFiscalDuplicadaException.class, () -> notaFiscalService.emitirNota(request));
 
         // A validação de duplicidade acontece ANTES do loop de itens: produtoRepository nunca deve ser chamado
-        verify(produtoRepository, never()).findByIdAtivoTrue(any());
+        verify(produtoRepository, never()).findByIdAndAtivoTrue(any());
         verify(notaFiscalRepository, never()).save(any());
     }
 
-    // ---------- emitirNota: produto ----------
+    //  emitirNota: produto
 
     @Test
     @DisplayName("Deve lançar ProdutoNaoEncontradoException quando um item referencia produto inexistente ou inativo")
@@ -183,9 +183,9 @@ class NotaFiscalServiceTest {
         ItemNotaRequestDTO itemRequest = new ItemNotaRequestDTO(999L, 1, null);
         NotaFiscalRequestDTO request = new NotaFiscalRequestDTO(12345L, LocalDateTime.now(), 1L, List.of(itemRequest));
 
-        when(empresaRepository.findByIdAtivoTrue(1L)).thenReturn(Optional.of(empresaMock));
+        when(empresaRepository.findByIdAndAtivoTrue(1L)).thenReturn(Optional.of(empresaMock));
         when(notaFiscalRepository.existsByNumeroNotaAndEmpresaEmissoraId(12345L, 1L)).thenReturn(false);
-        when(produtoRepository.findByIdAtivoTrue(999L)).thenReturn(Optional.empty());
+        when(produtoRepository.findByIdAndAtivoTrue(999L)).thenReturn(Optional.empty());
 
         assertThrows(ProdutoNaoEncontradoException.class, () -> notaFiscalService.emitirNota(request));
         verify(notaFiscalRepository, never()).save(any());
@@ -267,15 +267,18 @@ class NotaFiscalServiceTest {
     }
 
     @Test
+    @DisplayName("buscarPorEmpresa: deve retornar a página de notas mapeadas quando a empresa existe")
     void deveRetornarNotasPorEmpresaComSucesso() {
         Pageable pageable = PageRequest.of(0, 10);
-        long empresaId = 1;
+        long empresaId = 1L;
+        long numeroNota = 2321L;
+        BigDecimal valorTotal = new BigDecimal("2000.00");
 
         NotaFiscal nota = new NotaFiscal();
-        nota.setId(empresaId);
-        nota.setNumeroNota(2321L);
+        nota.setId(1L);
+        nota.setNumeroNota(numeroNota);
         nota.setStatus(StatusNota.PROCESSANDO);
-        nota.setValorTotal(BigDecimal.valueOf(2000));
+        nota.setValorTotal(valorTotal);
         nota.setEmpresaEmissora(empresaAtiva());
 
         Page<NotaFiscal> paginaMock = new PageImpl<>(List.of(nota), pageable, 1);
@@ -286,8 +289,8 @@ class NotaFiscalServiceTest {
         Page<NotaFiscalResponseDTO> resultado = notaFiscalService.buscarPorEmpresa(pageable, empresaId);
 
         assertEquals(1, resultado.getContent().size());
-        assertEquals(12345L, resultado.getContent().get(0).numeroNota());
-        assertEquals(new BigDecimal("154.00"), resultado.getContent().get(0).valorTotal());
+        assertEquals(numeroNota, resultado.getContent().get(0).numeroNota());
+        assertEquals(valorTotal, resultado.getContent().get(0).valorTotal());
         verify(notaFiscalRepository, times(1)).findByEmpresaEmissoraId(pageable, empresaId);
     }
 }

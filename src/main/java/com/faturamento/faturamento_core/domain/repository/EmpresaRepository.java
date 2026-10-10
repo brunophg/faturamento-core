@@ -13,7 +13,7 @@ public interface EmpresaRepository extends JpaRepository<Empresa, Long> {
 
     Page<Empresa> findAllByAtivoTrue(Pageable pageable);
 
-    Optional<Empresa> findByIdAtivoTrue(Long id);
+    Optional<Empresa> findByIdAndAtivoTrue(Long id);
 
-    Optional<Empresa> findByCnpjAtivoTrue(String cnpj);
+    Optional<Empresa> findByCnpjAndAtivoTrue(String cnpj);
 }
