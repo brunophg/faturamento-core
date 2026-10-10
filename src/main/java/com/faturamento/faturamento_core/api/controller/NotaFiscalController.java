@@ -47,4 +47,14 @@ public class NotaFiscalController {
         return ResponseEntity.created(uri).body(notaNova);
     }
 
+    @PatchMapping("/{id}/emitir")
+    public ResponseEntity<NotaFiscalResponseDTO> concluirEmissao(@PathVariable Long id) {
+        return ResponseEntity.ok(notaFiscalService.concluirEmissão(id));
+    }
+
+    @PatchMapping("/{id}/cancelar")
+    public ResponseEntity<NotaFiscalResponseDTO> cancelar(@PathVariable Long id) {
+        return ResponseEntity.ok(notaFiscalService.cancelar(id));
+    }
+
 }
