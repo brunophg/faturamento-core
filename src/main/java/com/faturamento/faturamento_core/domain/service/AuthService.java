@@ -1,18 +1,23 @@
 package com.faturamento.faturamento_core.domain.service;
 
+import com.faturamento.faturamento_core.domain.dto.auth.RegisterRequestDTO;
+import com.faturamento.faturamento_core.domain.model.Usuario;
 import com.faturamento.faturamento_core.domain.repository.UsuarioRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
 public class AuthService implements UserDetailsService {
 
     private final UsuarioRepository usuarioRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public AuthService(UsuarioRepository usuarioRepository) {
+    public AuthService(UsuarioRepository usuarioRepository, PasswordEncoder passwordEncoder) {
         this.usuarioRepository = usuarioRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
 
@@ -27,4 +32,18 @@ public class AuthService implements UserDetailsService {
 
         return usuario;
     }
+
+    public boolean cadastrar(RegisterRequestDTO request) {
+        if (usuarioRepository.findByLogin(request.login()) != null) {
+            return false;
+        }
+        String senhaCriptografada = passwordEncoder.encode(request.senha());
+
+
+        Usuario novoUsuario = new Usuario(request.login(), senhaCriptografada);
+        usuarioRepository.save(novoUsuario);
+
+        return true;
+    }
+
 }
