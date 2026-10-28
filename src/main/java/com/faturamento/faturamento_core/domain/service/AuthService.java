@@ -1,6 +1,7 @@
 package com.faturamento.faturamento_core.domain.service;
 
 import com.faturamento.faturamento_core.domain.dto.auth.RegisterRequestDTO;
+import com.faturamento.faturamento_core.domain.exception.LoginDuplicadoException;
 import com.faturamento.faturamento_core.domain.model.Usuario;
 import com.faturamento.faturamento_core.domain.repository.UsuarioRepository;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -33,17 +34,15 @@ public class AuthService implements UserDetailsService {
         return usuario;
     }
 
-    public boolean cadastrar(RegisterRequestDTO request) {
+    public void cadastrar(RegisterRequestDTO request) {
         if (usuarioRepository.findByLogin(request.login()) != null) {
-            return false;
+            throw new LoginDuplicadoException("Ja existe um usuario cadastrado com esse login");
         }
         String senhaCriptografada = passwordEncoder.encode(request.senha());
 
 
         Usuario novoUsuario = new Usuario(request.login(), senhaCriptografada);
         usuarioRepository.save(novoUsuario);
-
-        return true;
     }
 
 }

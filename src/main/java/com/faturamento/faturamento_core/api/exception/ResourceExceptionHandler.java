@@ -31,7 +31,7 @@ public class ResourceExceptionHandler {
         return ResponseEntity.status(status).body(err);
     }
 
-    @ExceptionHandler({CnpjDuplicadoException.class, NotaFiscalDuplicadaException.class})
+    @ExceptionHandler({CnpjDuplicadoException.class, NotaFiscalDuplicadaException.class, LoginDuplicadoException.class})
     public ResponseEntity<StandardError> handleDuplicidade(RegraNegocioException e, HttpServletRequest request) {
         HttpStatus status = HttpStatus.CONFLICT;
 
@@ -64,18 +64,51 @@ public class ResourceExceptionHandler {
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)
-    public ResponseEntity<StandardError> handleDataIntegrityViolation(DataIntegrityViolationException e, HttpServletRequest request) {
+    public ResponseEntity<StandardError> handleDataIntegrityViolation(
+            DataIntegrityViolationException e,
+            HttpServletRequest request) {
+
         HttpStatus status = HttpStatus.CONFLICT;
+
+        boolean loginDuplicado = isLoginUniqueViolation(e);
+
+        String titulo = loginDuplicado
+                ? "Login duplicado"
+                : "Violação de Integridade de Dados";
+
+        String mensagem = loginDuplicado
+                ? "Já existe um usuário cadastrado com esse login."
+                : "Não foi possível concluir a operação devido a uma "
+                + "violação de integridade dos dados.";
 
         StandardError err = new StandardError(
                 Instant.now(),
                 status.value(),
-                "Violação de Integridade de Dados",
-                "Não é possível excluir este registro, pois existem dados vinculados a ele (ex: notas fiscais).",
+                titulo,
+                mensagem,
                 request.getRequestURI()
         );
 
         return ResponseEntity.status(status).body(err);
+    }
+
+    private boolean isLoginUniqueViolation(Throwable exception) {
+        Throwable causa = exception;
+
+        while (causa != null) {
+            if (causa instanceof
+                    org.hibernate.exception.ConstraintViolationException violacao) {
+
+                if ("uk_usuario_login".equalsIgnoreCase(
+                        violacao.getConstraintName())) {
+                    return true;
+                }
+            }
+
+            causa = causa.getCause();
+        }
+
+        return false;
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

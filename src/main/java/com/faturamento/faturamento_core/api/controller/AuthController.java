@@ -47,9 +47,7 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<Void> register (@RequestBody @Valid RegisterRequestDTO request) {
 
-        if (!authService.cadastrar(request)) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        }
+        authService.cadastrar(request);
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }

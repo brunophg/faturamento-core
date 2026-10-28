@@ -9,14 +9,20 @@ import java.util.List;
 import java.util.Objects;
 
 @Entity
-@Table(name = "tb_usuario")
+@Table(name = "tb_usuario",
+uniqueConstraints = {
+        @UniqueConstraint(
+                name = "uk_usuario_login",
+                columnNames = "login"
+        )
+})
 public class Usuario implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "login", nullable = false, unique = true)
+    @Column(name = "login", nullable = false)
     private String login;
 
     @Column(name = "senha", nullable = false)

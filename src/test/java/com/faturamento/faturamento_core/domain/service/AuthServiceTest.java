@@ -1,6 +1,7 @@
 package com.faturamento.faturamento_core.domain.service;
 
 import com.faturamento.faturamento_core.domain.dto.auth.RegisterRequestDTO;
+import com.faturamento.faturamento_core.domain.exception.LoginDuplicadoException;
 import com.faturamento.faturamento_core.domain.model.Usuario;
 import com.faturamento.faturamento_core.domain.repository.UsuarioRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -68,9 +69,7 @@ class AuthServiceTest {
         when(passwordEncoder.encode(senha))
                 .thenReturn(senhaCriptografada);
 
-        boolean resultado = authService.cadastrar(request);
-
-        assertTrue(resultado);
+        assertDoesNotThrow(() -> authService.cadastrar(request));
 
         ArgumentCaptor<Usuario> captor =
                 ArgumentCaptor.forClass(Usuario.class);
@@ -85,26 +84,25 @@ class AuthServiceTest {
         verify(passwordEncoder).encode(senha);
     }
 
+
     @Test
-    @DisplayName("cadastrar: deve recusar login já existente")
-    void deveRecusarCadastroQuandoLoginJaExiste() {
+    @DisplayName("cadastrar: deve lançar exceção quando login já existe")
+    void deveLancarExcecaoQuandoLoginJaExiste() {
         String login = "bruno";
-        String senha = "senha123";
 
         RegisterRequestDTO request =
-                new RegisterRequestDTO(login, senha);
-
-        Usuario usuarioExistente =
-                new Usuario(login, "hash-existente");
+                new RegisterRequestDTO(login, "senha123");
 
         when(usuarioRepository.findByLogin(login))
-                .thenReturn(usuarioExistente);
+                .thenReturn(new Usuario(login, "hash-existente"));
 
-        boolean resultado = authService.cadastrar(request);
-
-        assertFalse(resultado);
+        assertThrows(
+                LoginDuplicadoException.class,
+                () -> authService.cadastrar(request)
+        );
 
         verify(usuarioRepository, never()).save(any(Usuario.class));
         verify(passwordEncoder, never()).encode(anyString());
     }
+
 }
