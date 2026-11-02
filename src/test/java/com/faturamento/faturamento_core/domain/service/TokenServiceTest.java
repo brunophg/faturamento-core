@@ -10,6 +10,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 class TokenServiceTest {
@@ -41,13 +42,13 @@ class TokenServiceTest {
     void deveDevolverLoginAoValidarTokenGerado() {
         String token = tokenService.gerarToken(usuario);
 
-        assertEquals("bruno", tokenService.validarToken(token));
+        assertEquals(Optional.of("bruno"), tokenService.validarToken(token));
     }
 
     @Test
     @DisplayName("validarToken: deve devolver vazio para um texto que não é um JWT")
     void deveDevolverVazioParaTokenMalformado() {
-        assertEquals("", tokenService.validarToken("abc"));
+        assertEquals(Optional.empty(), tokenService.validarToken("abc"));
     }
 
     @Test
@@ -56,7 +57,7 @@ class TokenServiceTest {
         String token = tokenService.gerarToken(usuario);
         String adulterado = token.substring(0, token.lastIndexOf('.') + 1) + "assinaturaFalsa";
 
-        assertEquals("", tokenService.validarToken(adulterado));
+        assertEquals(Optional.empty(), tokenService.validarToken(adulterado));
     }
 
     @Test
@@ -66,7 +67,7 @@ class TokenServiceTest {
         ReflectionTestUtils.setField(outroServico, "secret", "outro-segredo");
         String tokenDeOutroServico = outroServico.gerarToken(usuario);
 
-        assertEquals("", tokenService.validarToken(tokenDeOutroServico));
+        assertEquals(Optional.empty(), tokenService.validarToken(tokenDeOutroServico));
     }
 
     @Test
@@ -79,7 +80,7 @@ class TokenServiceTest {
                 .withExpiresAt(Instant.now().minusSeconds(60))
                 .sign(Algorithm.HMAC256(SEGREDO));
 
-        assertEquals("", tokenService.validarToken(tokenExpirado));
+        assertEquals(Optional.empty(), tokenService.validarToken(tokenExpirado));
     }
 
     @Test
@@ -91,7 +92,7 @@ class TokenServiceTest {
                 .withExpiresAt(Instant.now().plusSeconds(3600))
                 .sign(Algorithm.HMAC256(SEGREDO));
 
-        assertEquals("", tokenService.validarToken(tokenOutroEmissor));
+        assertEquals(Optional.empty(), tokenService.validarToken(tokenOutroEmissor));
     }
 
     @Test

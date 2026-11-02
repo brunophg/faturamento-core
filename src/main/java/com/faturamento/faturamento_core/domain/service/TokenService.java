@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Optional;
 
 @Service
 public class TokenService {
@@ -31,17 +32,24 @@ public class TokenService {
         }
     }
 
-    public String validarToken(String token) {
+    public Optional<String> validarToken(String token) {
         try {
             Algorithm algorithm = Algorithm.HMAC256(secret);
 
-            return JWT.require(algorithm)
+            String login = JWT.require(algorithm)
                     .withIssuer("api-faturamento-core")
                     .build()
                     .verify(token)
-                    .getSubject(); // Devolve o login do usuário se o token for válido
+                    .getSubject();
+
+            if (login == null || login.isBlank()) {
+                return Optional.empty();
+            }
+
+            return Optional.of(login);
+
         } catch (JWTVerificationException e) {
-            return "";
+            return Optional.empty();
         }
     }
 
